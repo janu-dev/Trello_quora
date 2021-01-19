@@ -66,7 +66,7 @@ public class UserController {
         /* Basic asdewdasceasdaisdiebdenceunudbas==
            username:passowrd --> base64 encoded format..
          */
-        byte[] decode = Base64.getDecoder().decode(authorization.split("Basic")[1].replace(" ",""));// extracting the second field from the above eg..
+        byte[] decode = Base64.getDecoder().decode(authorization.split("Basic")[0]);
         String decodedText = new String(decode);
         String[] decodedArray = decodedText.split(":"); //username:password
 
