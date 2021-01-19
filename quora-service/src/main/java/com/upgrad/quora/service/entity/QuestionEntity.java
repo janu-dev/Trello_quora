@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "question", schema = "quora")
+@Table(name = "question")
 /*@NamedQueries({
         @NamedQuery(name = "roleByuuid" , query = "select r from RoleEntity r where r.uuid =:uuid")
 })*/
@@ -40,7 +40,6 @@ public class QuestionEntity implements Serializable{
     private String content;
 
     @Column(name = "date")
-    @Size(max = 6)
     private LocalDateTime date; // TIMESTAMP WITHOUT TIME ZONE
 
     @ManyToOne

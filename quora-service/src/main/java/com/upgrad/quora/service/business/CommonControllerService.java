@@ -41,8 +41,9 @@ public class CommonControllerService {
             throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to get user details");
         }
 
-        return userDao.getUser(accessToken.getUuid());
+     //   return userDao.getUser(accessToken.getUuid());
 
+        return accessToken.getUser();
     }
 
 
