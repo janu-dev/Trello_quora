@@ -56,7 +56,7 @@ public class QuestionController {
         return new ResponseEntity<QuestionResponse>(questionResponse, HttpStatus.CREATED);
     }
     @RequestMapping(method = RequestMethod.GET, path = "/question/all", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<Object> getAllQuestion(@RequestHeader("authorization") final String authorization )
+    public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestion(@RequestHeader("authorization") final String authorization )
             throws AuthorizationFailedException
     {
         String accessToken = authorization.split("Bearer")[0];
@@ -73,7 +73,7 @@ public class QuestionController {
             }
 
 
-        return new ResponseEntity<>(qResponseList,HttpStatus.OK );
+        return new ResponseEntity<List<QuestionDetailsResponse>>(qResponseList,HttpStatus.OK );
 
     }
 
