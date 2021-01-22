@@ -13,10 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,9 +32,8 @@ public class QuestionController {
 
 
     @RequestMapping(method = RequestMethod.POST, path = "/question/create", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<QuestionResponse> createQuestion(@RequestHeader("authorization") final String authorization , final QuestionRequest questionRequest)
-            throws AuthorizationFailedException
-    {
+    public ResponseEntity<QuestionResponse> createQuestion(@RequestHeader("authorization") final String authorization, final QuestionRequest questionRequest)
+            throws AuthorizationFailedException {
         String accessToken = authorization.split("Bearer")[0];
 
         final UserEntity userEntity = commonControllerService.getUser(accessToken);
@@ -55,10 +51,10 @@ public class QuestionController {
 
         return new ResponseEntity<QuestionResponse>(questionResponse, HttpStatus.CREATED);
     }
+
     @RequestMapping(method = RequestMethod.GET, path = "/question/all", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestion(@RequestHeader("authorization") final String authorization )
-            throws AuthorizationFailedException
-    {
+    public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestions(@RequestHeader("authorization") final String authorization)
+            throws AuthorizationFailedException {
         String accessToken = authorization.split("Bearer")[0];
 
         final UserEntity userEntity = commonControllerService.getUser(accessToken);
@@ -67,13 +63,31 @@ public class QuestionController {
 
         List<QuestionDetailsResponse> qResponseList = new ArrayList<>();
 
-       for(QuestionEntity q : allQuestions)
-            {
-                qResponseList.add(new QuestionDetailsResponse().id(q.getUuid()).content(q.getContent()));
-            }
+        for (QuestionEntity q : allQuestions) {
+            qResponseList.add(new QuestionDetailsResponse().id(q.getUuid()).content(q.getContent()));
+        }
 
+        return new ResponseEntity<List<QuestionDetailsResponse>>(qResponseList, HttpStatus.OK);
 
-        return new ResponseEntity<List<QuestionDetailsResponse>>(qResponseList,HttpStatus.OK );
+    }
+
+    @RequestMapping(method = RequestMethod.GET, path = "/question/all/{userId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestionsByUser(@RequestHeader("authorization") final String authorization,
+                                                                               @PathVariable("userId") final String userUUID   ) throws AuthorizationFailedException
+    {
+        String accessToken = authorization.split("Bearer")[0];
+
+        final UserEntity userEntity = commonControllerService.getUser(accessToken);
+
+        List<QuestionEntity> allQuestions = questionControllerService.getAllQuestionsByUser(userEntity);
+
+        List<QuestionDetailsResponse> qResponseList = new ArrayList<>();
+
+        for (QuestionEntity q : allQuestions) {
+            qResponseList.add(new QuestionDetailsResponse().id(q.getUuid()).content(q.getContent()));
+        }
+
+        return new ResponseEntity<List<QuestionDetailsResponse>>(qResponseList, HttpStatus.OK);
 
     }
 
