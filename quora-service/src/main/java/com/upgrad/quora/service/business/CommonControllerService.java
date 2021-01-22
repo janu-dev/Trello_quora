@@ -29,4 +29,23 @@ public class CommonControllerService {
         }
         return userEntity;
     }
+
+    //Check user authorization with access token
+    @Transactional(propagation = Propagation.REQUIRED)
+    public UserEntity getUser(final String authToken) throws AuthorizationFailedException {
+        UserAuthTokenEntity accessToken = userDao.getUserAuthTokenEntity(authToken);
+
+        if(accessToken == null) {
+            throw new AuthorizationFailedException("ATHR-001", "User has not signed in");
+        }else if(accessToken.getLogoutAt() != null){
+            throw new AuthorizationFailedException("ATHR-002", "User is signed out.Sign in first to get user details");
+        }
+
+     //   return userDao.getUser(accessToken.getUuid());
+
+        return accessToken.getUser();
+    }
+
+
+
 }

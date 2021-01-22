@@ -18,7 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 @Entity
-@Table(name = "question", schema = "quora")
+@Table(name = "question")
 /*@NamedQueries({
         @NamedQuery(name = "roleByuuid" , query = "select r from RoleEntity r where r.uuid =:uuid")
 })*/
@@ -32,7 +32,7 @@ public class QuestionEntity implements Serializable{
     @Column(name = "uuid")
     @NotNull
     @Size(max = 200)
-    private int uuid;
+    private String uuid;
 
     @Column(name = "content")
     @NotNull
@@ -40,7 +40,6 @@ public class QuestionEntity implements Serializable{
     private String content;
 
     @Column(name = "date")
-    @Size(max = 6)
     private LocalDateTime date; // TIMESTAMP WITHOUT TIME ZONE
 
     @ManyToOne
@@ -69,11 +68,11 @@ public class QuestionEntity implements Serializable{
         this.id = id;
     }
 
-    public int getUuid() {
+    public String getUuid() {
         return uuid;
     }
 
-    public void setUuid(int uuid) {
+    public void setUuid(String uuid) {
         this.uuid = uuid;
     }
 
