@@ -67,7 +67,7 @@ public class CommonControllerService {
                 throw new AuthorizationFailedException("ATHR-003", "Only the question owner can edit the question");
             }
 
-            if(user.getRole() == "nonadmin")
+            if(user.getRole().equals("nonadmin") )
             {
                 throw new AuthorizationFailedException("ATHR-003", "Only the question owner or admin can delete the question");
             }

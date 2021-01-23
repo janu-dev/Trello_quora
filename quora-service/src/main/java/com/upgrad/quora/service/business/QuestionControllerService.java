@@ -53,6 +53,12 @@ public class QuestionControllerService {
         questionDao.updateQuestion(questionEntity);
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void deleteQuestion(QuestionEntity questionEntity)
+    {
+        questionDao.deleteQuestion(questionEntity);
+    }
+
 
 
 
