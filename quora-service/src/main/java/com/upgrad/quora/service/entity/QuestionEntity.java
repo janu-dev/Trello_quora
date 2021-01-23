@@ -19,9 +19,9 @@ import java.util.List;
 
 @Entity
 @Table(name = "question")
-/*@NamedQueries({
-        @NamedQuery(name = "roleByuuid" , query = "select r from RoleEntity r where r.uuid =:uuid")
-})*/
+@NamedQueries({
+        @NamedQuery(name = "questionByuuid" , query = "select q from QuestionEntity q where q.uuid =:uuid")
+})
 public class QuestionEntity implements Serializable{
 
     @Id
