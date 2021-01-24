@@ -19,6 +19,10 @@ import java.util.List;
 /*@NamedQueries({
         @NamedQuery(name = "roleByuuid" , query = "select r from RoleEntity r where r.uuid =:uuid")
 })*/
+
+@NamedQueries({
+        @NamedQuery(name = "answerByuuid" , query = "select a from AnswerEntity a where a.uuid =:uuid")
+})
 public class AnswerEntity implements Serializable{
 
     @Id

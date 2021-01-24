@@ -5,6 +5,7 @@ import com.upgrad.quora.service.entity.QuestionEntity;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 
 @Repository
@@ -18,4 +19,18 @@ public class AnswerDao {
         return answerEntity;
     }
 
+    public void updateAnswer(AnswerEntity answerEntity) {
+        entityManager.merge(answerEntity);
+    }
+
+    public AnswerEntity getAnswerById(String answerUUID) {
+        try {
+            return entityManager
+                    .createNamedQuery("answerByuuid", AnswerEntity.class)
+                    .setParameter("uuid", answerUUID)
+                    .getSingleResult();
+        } catch (NoResultException nre) {
+            return null;
+        }
+    }
 }
