@@ -62,5 +62,11 @@ public class AnswerControllerService {
 
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void deleteAnswer(AnswerEntity answerEntity)
+    {
+        answerDao.deleteAnswer(answerEntity);
+    }
+
 
 }

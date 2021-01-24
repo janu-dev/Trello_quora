@@ -15,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -85,6 +87,28 @@ public class AnswerController {
 
         AnswerEditResponse answerEditResponse = new AnswerEditResponse().id(answerUUID).status("ANSWER EDITED");
         return new ResponseEntity<AnswerEditResponse>(answerEditResponse, HttpStatus.OK);
+
+
+    }
+
+    @RequestMapping(method = RequestMethod.DELETE, path = "/answer/delete/{answerId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<AnswerDeleteResponse> deleteAnswer(
+            @RequestHeader("authorization") final String authorization,
+            @PathVariable("answerId") final String answerUUID  ) throws AuthorizationFailedException, AnswerNotFoundException  {
+
+        String accessToken = authorization.split("Bearer")[0];
+
+        final UserEntity userEntity = commonControllerService.getUser(accessToken, "ATHR-002", "User is signed out.Sign in first to delete an answer");
+
+        final AnswerEntity answerEntity = answerControllerService.getAnswerById(answerUUID);
+
+        answerControllerService.canEditOrDelete(answerEntity, userEntity, true);
+
+        answerControllerService.deleteAnswer(answerEntity);
+
+
+        AnswerDeleteResponse answerDeleteResponse = new AnswerDeleteResponse().id(answerUUID).status("ANSWER DELETED");
+        return new ResponseEntity<AnswerDeleteResponse>(answerDeleteResponse, HttpStatus.OK);
 
 
     }
