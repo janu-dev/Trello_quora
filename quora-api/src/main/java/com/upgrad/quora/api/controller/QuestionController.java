@@ -12,9 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,17 +52,17 @@ public class QuestionController {
 
     @RequestMapping(method = RequestMethod.GET, path = "/question/all", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestions(@RequestHeader("authorization") final String authorization)
-            throws AuthorizationFailedException {
+            throws AuthorizationFailedException, UserNotFoundException, InvalidQuestionException {
         String accessToken = authorization.split("Bearer")[0];
 
         commonControllerService.getUser(accessToken, "ATHR-002", "User is signed out.Sign in first to get all questions");
 
         List<QuestionEntity> allQuestions = questionControllerService.getAllQuestions();
+        List<QuestionDetailsResponse> qResponseList  = detailedResponse(allQuestions);
 
-        List<QuestionDetailsResponse> qResponseList = new ArrayList<>();
-
-        for (QuestionEntity q : allQuestions) {
-            qResponseList.add(new QuestionDetailsResponse().id(q.getUuid()).content(q.getContent()));
+        // Checking if there are questions posted.
+        if(allQuestions.isEmpty()){
+            throw new InvalidQuestionException("QUES-1","There are no questions posted by users.");
         }
 
         return new ResponseEntity<List<QuestionDetailsResponse>>(qResponseList, HttpStatus.OK);
@@ -73,7 +71,7 @@ public class QuestionController {
 
     @RequestMapping(method = RequestMethod.GET, path = "/question/all/{userId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<QuestionDetailsResponse>> getAllQuestionsByUser(@RequestHeader("authorization") final String authorization,
-                                                                               @PathVariable("userId") final String userUUID) throws AuthorizationFailedException, UserNotFoundException {
+                                                                               @PathVariable("userId") final String userUUID) throws AuthorizationFailedException, UserNotFoundException, InvalidQuestionException {
         String accessToken = authorization.split("Bearer")[0];
 
         commonControllerService.getUser(accessToken, "ATHR-002", "User is signed out.Sign in first to get all questions posted by a specific user");
@@ -81,12 +79,12 @@ public class QuestionController {
         final UserEntity userEntity = commonControllerService.getUserById(userUUID);
 
         List<QuestionEntity> allQuestions = questionControllerService.getAllQuestionsByUser(userEntity);
-
-        List<QuestionDetailsResponse> qResponseList = new ArrayList<>();
-
-        for (QuestionEntity q : allQuestions) {
-            qResponseList.add(new QuestionDetailsResponse().id(q.getUuid()).content(q.getContent()));
+        // Checking if the user has posted any questions.
+        if(allQuestions.isEmpty()){
+            throw new InvalidQuestionException("QUES-2","User with entered uuid has not posted any questions yet.");
         }
+
+        List<QuestionDetailsResponse> qResponseList  = detailedResponse(allQuestions);
 
         return new ResponseEntity<List<QuestionDetailsResponse>>(qResponseList, HttpStatus.OK);
 
@@ -114,11 +112,8 @@ public class QuestionController {
 
         questionControllerService.updateQuestion(updatedQuestion);
 
-
         QuestionEditResponse questionEditResponse = new QuestionEditResponse().id(questionUUID).status("QUESTION EDITED");
         return new ResponseEntity<QuestionEditResponse>(questionEditResponse, HttpStatus.OK);
-
-
     }
 
     @RequestMapping(method = RequestMethod.DELETE, path = "/question/delete/{questionId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -139,12 +134,15 @@ public class QuestionController {
 
         QuestionDeleteResponse questionDeleteResponse = new QuestionDeleteResponse().id(questionUUID).status("QUESTION DELETED");
         return new ResponseEntity<QuestionDeleteResponse>(questionDeleteResponse, HttpStatus.OK);
-
-
     }
 
+    private List<QuestionDetailsResponse> detailedResponse(List<QuestionEntity> listOfQuestions) throws UserNotFoundException, AuthorizationFailedException, InvalidQuestionException {
 
-
-
-
+        List<QuestionDetailsResponse> listOfResponse = new ArrayList<>();
+        for(QuestionEntity questions : listOfQuestions){
+            QuestionDetailsResponse responseEntity = new QuestionDetailsResponse().id(questions.getUuid()).content(questions.getContent());
+            listOfResponse.add(responseEntity);
+        }
+        return listOfResponse;
+    }
 }
