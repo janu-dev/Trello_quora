@@ -2,11 +2,13 @@ package com.upgrad.quora.service.dao;
 
 import com.upgrad.quora.service.entity.AnswerEntity;
 import com.upgrad.quora.service.entity.QuestionEntity;
+import com.upgrad.quora.service.entity.UserEntity;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 
 @Repository
 public class AnswerDao {
@@ -36,5 +38,13 @@ public class AnswerDao {
 
     public void deleteAnswer(AnswerEntity answerEntity) {
         entityManager.remove(answerEntity);
+    }
+
+    public List<AnswerEntity> getAllAnswersByQuestion(QuestionEntity q) {
+        //Named Query could'nt be used because of multiple results
+        return entityManager.createQuery("SELECT q from AnswerEntity q where q.question.uuid = :questionUUID", AnswerEntity.class)
+                .setParameter("questionUUID", q.getUuid())
+                .getResultList();
+
     }
 }

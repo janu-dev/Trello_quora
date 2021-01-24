@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 public class AnswerControllerService {
 
@@ -66,6 +68,10 @@ public class AnswerControllerService {
     public void deleteAnswer(AnswerEntity answerEntity)
     {
         answerDao.deleteAnswer(answerEntity);
+    }
+
+    public List<AnswerEntity> getAllAnswersByQuestion(QuestionEntity q){
+        return answerDao.getAllAnswersByQuestion(q);
     }
 
 

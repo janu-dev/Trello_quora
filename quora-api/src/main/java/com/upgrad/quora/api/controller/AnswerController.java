@@ -11,6 +11,7 @@ import com.upgrad.quora.service.entity.UserEntity;
 import com.upgrad.quora.service.exception.AnswerNotFoundException;
 import com.upgrad.quora.service.exception.AuthorizationFailedException;
 import com.upgrad.quora.service.exception.InvalidQuestionException;
+import com.upgrad.quora.service.exception.UserNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -20,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -110,6 +113,27 @@ public class AnswerController {
         AnswerDeleteResponse answerDeleteResponse = new AnswerDeleteResponse().id(answerUUID).status("ANSWER DELETED");
         return new ResponseEntity<AnswerDeleteResponse>(answerDeleteResponse, HttpStatus.OK);
 
+
+    }
+
+    @RequestMapping(method = RequestMethod.GET, path = "answer/all/{questionId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseEntity<List<AnswerDetailsResponse>> getAllAnswersByUser(@RequestHeader("authorization") final String authorization,
+                                                                           @PathVariable("questionId") final String questionUUID) throws AuthorizationFailedException, UserNotFoundException, InvalidQuestionException {
+        String accessToken = authorization.split("Bearer")[0];
+
+        final UserEntity userEntity = commonControllerService.getUser(accessToken, "ATHR-002", "User is signed out.Sign in first to get the answers");
+
+        QuestionEntity questionEntity = questionControllerService.getQuestionById(questionUUID);
+
+        List<AnswerEntity> allAnswers = answerControllerService.getAllAnswersByQuestion(questionEntity);
+
+        List<AnswerDetailsResponse> qResponseList = new ArrayList<>();
+
+        for (AnswerEntity q : allAnswers) {
+            qResponseList.add(new AnswerDetailsResponse().id(q.getUuid()).answerContent(q.getAns()).questionContent(q.getQuestion().getContent()));
+        }
+
+        return new ResponseEntity<List<AnswerDetailsResponse>>(qResponseList, HttpStatus.OK);
 
     }
 }
