@@ -118,7 +118,7 @@ public class AnswerController {
 
     @RequestMapping(method = RequestMethod.GET, path = "answer/all/{questionId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<List<AnswerDetailsResponse>> getAllAnswersByUser(@RequestHeader("authorization") final String authorization,
-                                                                           @PathVariable("questionId") final String questionUUID) throws AuthorizationFailedException, UserNotFoundException, InvalidQuestionException {
+                                                                           @PathVariable("questionId") final String questionUUID) throws AuthorizationFailedException, UserNotFoundException, InvalidQuestionException, AnswerNotFoundException {
         String accessToken = authorization.split("Bearer")[0];
 
         final UserEntity userEntity = commonControllerService.getUser(accessToken, "ATHR-002", "User is signed out.Sign in first to get the answers");
@@ -126,6 +126,9 @@ public class AnswerController {
         QuestionEntity questionEntity = questionControllerService.getQuestionById(questionUUID);
 
         List<AnswerEntity> allAnswers = answerControllerService.getAllAnswersByQuestion(questionEntity);
+        if(allAnswers.isEmpty()){
+            throw new AnswerNotFoundException("ANS-001", "No Answers posted for the question");
+        }
 
         List<AnswerDetailsResponse> qResponseList = new ArrayList<>();
 
